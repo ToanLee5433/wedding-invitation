@@ -93,56 +93,32 @@ const AIFaceBooth: React.FC = () => {
     setError(null);
 
     try {
-      // Note: In a real production app, this should be moved to an Edge Function
-      // to keep the VITE_GEMINI_API_KEY secure.
-      const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
-
-      const baseImageBase64 = await fetchAsBase64(WEDDING_BASE_IMAGE_URL);
       const guestImageBase64 = guestImage.split(',')[1];
 
-      const prompt = `You are a high-end AI editorial photographer. YOUR GOAL: Perfectly composite the guest into the original wedding photo.
-      
-INPUT:
-- Background: A luxury wedding scene with a couple (Trang & Chiến).
-- Subject: The guest's portrait.
-
-RULES:
-1. PLACE the guest naturally standing NEXT to the couple in the scene.
-2. MAINTAIN 100% facial likeness, hairstyle, and unique features of the guest. 
-3. MATCH lighting, shadows, and professional color grading (warm, cinematic, luxury). 
-4. SCALE properly relative to the couple and floor.
-5. QUALITY: High resolution, sharp edges, no artifacts.
-
-OUTPUT: Return only the final image.`;
-
-      const response = await ai.models.generateContent({
-        model: 'gemini-1.5-flash',
-        contents: {
-          parts: [
-            { inlineData: { data: baseImageBase64, mimeType: 'image/jpeg' } },
-            { inlineData: { data: guestImageBase64, mimeType: 'image/jpeg' } },
-            { text: prompt },
-          ],
-        },
+      // Call the Edge Function instead of calling Gemini directly
+      // This bypasses CORS and keeps the API key secure on the server
+      const response = await fetch('/api/generate-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ guestImageBase64 }),
       });
 
-      let finalImageUrl = null;
-      if (response.candidates?.[0]?.content?.parts) {
-        const imagePart = response.candidates[0].content.parts.find(part => part.inlineData);
-        if (imagePart) {
-          finalImageUrl = `data:image/png;base64,${imagePart.inlineData.data}`;
-        }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `API error: ${response.status}`);
       }
 
-      if (finalImageUrl) {
-        setResultImage(finalImageUrl);
+      const data = await response.json();
+
+      if (data.resultImage) {
+        setResultImage(data.resultImage);
       } else {
         throw new Error("AI không trả về dữ liệu hình ảnh.");
       }
 
     } catch (err: any) {
       console.error("AI Booth Error:", err);
-      setError("Có lỗi xảy ra khi tạo ảnh. Vui lòng thử lại.");
+      setError(err.message || "Có lỗi xảy ra khi tạo ảnh. Vui lòng thử lại.");
       setStep(2);
     } finally {
       setIsProcessing(false);
