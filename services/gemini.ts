@@ -1,22 +1,28 @@
 
-import { GoogleGenAI } from "@google/genai";
-
 /**
  * Gợi ý lời chúc đám cưới dựa trên tên khách mời.
- * Sử dụng trong component RSVP.
+ * Sử dụng Vercel Edge Function để giữ API key an toàn.
  */
 export async function suggestWeddingWish(guestName: string): Promise<string> {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const prompt = `Hãy viết một lời chúc đám cưới ngắn gọn (khoảng 20-30 chữ), chân thành, tinh tế và có chút lãng mạn cho đôi bạn trẻ Trang và Chiến. Người gửi tên là ${guestName || 'một người bạn'}. Hãy viết bằng tiếng Việt, ngôn ngữ tự nhiên, không quá sáo rỗng.`;
-
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
+    // Call the Edge Function (API key is stored server-side)
+    const response = await fetch('/api/suggest-wish', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ guestName }),
     });
-    return response.text || "Chúc hai bạn trăm năm hạnh phúc, đầu bạc răng long!";
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.wish || "Chúc hai bạn trăm năm hạnh phúc, đầu bạc răng long!";
+
   } catch (error) {
-    console.error("Gemini suggestWish error:", error);
+    console.error("Suggest wish error:", error);
     return "Chúc hai bạn mãi mãi bên nhau, cùng nhau xây dựng tổ ấm hạnh phúc viên mãn!";
   }
 }
