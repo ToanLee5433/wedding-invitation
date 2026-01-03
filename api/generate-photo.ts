@@ -5,6 +5,17 @@ export const config = {
 
 const WEDDING_BASE_IMAGE_URL = 'https://iv1cdn.vnecdn.net/giaitri/images/web/2025/10/23/toan-canh-dam-cuoi-cua-vo-chong-do-thi-ha-1761191294.jpg?w=1200&q=100';
 
+// Helper to convert ArrayBuffer to Base64 in Edge Runtime
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
+
 export default async function handler(req: Request) {
     if (req.method !== 'POST') {
         return new Response(JSON.stringify({ error: 'Method not allowed' }), {
@@ -25,18 +36,32 @@ export default async function handler(req: Request) {
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
-            return new Response(JSON.stringify({ error: 'GEMINI_API_KEY not configured' }), {
+            return new Response(JSON.stringify({ error: 'GEMINI_API_KEY không được cấu hình trên Vercel' }), {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' },
             });
         }
 
-        // 1. Fetch background image server-side (Bypasses CORS)
-        const bgResponse = await fetch(WEDDING_BASE_IMAGE_URL);
-        if (!bgResponse.ok) throw new Error('Failed to fetch background image');
-        const bgBlob = await bgResponse.blob();
-        const bgBuffer = await bgBlob.arrayBuffer();
-        const bgBase64 = btoa(new Uint8Array(bgBuffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        console.log('Fetching background image from:', WEDDING_BASE_IMAGE_URL);
+
+        // 1. Fetch background image server-side with browser-like headers
+        const bgResponse = await fetch(WEDDING_BASE_IMAGE_URL, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                'Referer': 'https://vnexpress.net/'
+            }
+        });
+
+        if (!bgResponse.ok) {
+            console.error('Background fetch failed:', bgResponse.status, bgResponse.statusText);
+            throw new Error(`Không thể tải ảnh nền từ Server (Status: ${bgResponse.status}). Có thể do Server ảnh chặn yêu cầu.`);
+        }
+
+        const bgBuffer = await bgResponse.arrayBuffer();
+        const bgBase64 = arrayBufferToBase64(bgBuffer);
+
+        console.log('Background image fetched and converted to base64. Calling Gemini...');
 
         // 2. Prepare Gemini Prompt
         const prompt = `You are a high-end AI editorial photographer. YOUR GOAL: Perfectly composite the guest into the original wedding photo.
@@ -74,8 +99,8 @@ OUTPUT: Return only the final image.`;
 
         if (!aiResponse.ok) {
             const errorData = await aiResponse.json();
-            console.error('Gemini API error:', errorData);
-            throw new Error(`Gemini API error: ${aiResponse.status}`);
+            console.error('Gemini API error details:', JSON.stringify(errorData));
+            throw new Error(`Lỗi từ Gemini AI: ${aiResponse.status}. ${errorData.error?.message || ''}`);
         }
 
         const data = await aiResponse.json();
@@ -89,7 +114,8 @@ OUTPUT: Return only the final image.`;
         }
 
         if (!finalImageBase64) {
-            throw new Error('AI did not return image data');
+            console.error('AI response data:', JSON.stringify(data));
+            throw new Error('AI không trả về dữ liệu hình ảnh sau khi xử lý.');
         }
 
         return new Response(JSON.stringify({ resultImage: `data:image/png;base64,${finalImageBase64}` }), {
@@ -99,7 +125,7 @@ OUTPUT: Return only the final image.`;
 
     } catch (error: any) {
         console.error('Edge Function Error:', error);
-        return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
+        return new Response(JSON.stringify({ error: error.message || 'Lỗi hệ thống nội bộ' }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });
