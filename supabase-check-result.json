@@ -1,0 +1,74 @@
+{
+  "top_level": {
+    "id": "OK",
+    "slug": "trang-chien-2026",
+    "hero_image": "OK",
+    "music_url": "OK",
+    "album_urls": "4 items",
+    "qr_groom": "MISSING",
+    "qr_bride": "MISSING"
+  },
+  "details": {
+    "groom_name": "Trịnh Mạnh Chiến",
+    "bride_name": "Cù Quỳnh Trang",
+    "event_date": "15 . 01 . 2026",
+    "invitation_text": "OK",
+    "initials": "T&C",
+    "invitation_quote": "OK",
+    "milestones": "4 items",
+    "vuQuy": "OK",
+    "thanhHon": "OK"
+  },
+  "raw_details": {
+    "vuQuy": {
+      "date": "30 . 01 . 2026",
+      "time": "08:00 AM",
+      "title": "Lễ Vu Quy",
+      "address": "Số 123, Đường Hoa Hồng, TP. Hà Nội",
+      "mapLink": "https://maps.google.com",
+      "location": "Tư gia Nhà Gái"
+    },
+    "initials": "T&C",
+    "thanhHon": {
+      "date": "30 . 01 . 2026",
+      "time": "11:00 AM",
+      "title": "Lễ Thành Hôn",
+      "address": "Km10 Đ. Nguyễn Trãi, P. Mộ Lao, Hà Đông, Hà Nội, Việt Nam",
+      "mapLink": "https://maps.app.goo.gl/BhqTC2NTD86knWXz9",
+      "location": "Trung tâm Hội nghị Diamond"
+    },
+    "bride_name": "Cù Quỳnh Trang",
+    "event_date": "15 . 01 . 2026",
+    "groom_name": "Trịnh Mạnh Chiến",
+    "milestones": [
+      {
+        "img": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=600",
+        "date": "10 / 05 / 2021",
+        "desc": "Vào một chiều mưa tại quán cafe nhỏ, định mệnh đã cho chúng mình gặp nhau.",
+        "icon": "calendar",
+        "title": "Lần đầu gặp gỡ"
+      },
+      {
+        "img": "https://images.unsplash.com/photo-1518196775741-201b817f5024?auto=format&fit=crop&q=80&w=600",
+        "date": "14 / 02 / 2022",
+        "desc": "Dưới ánh đèn lung linh của thành phố, chúng mình chính thức gọi nhau là 'Người yêu'.",
+        "title": "Lời tỏ tình ngọt ngào"
+      },
+      {
+        "img": "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=600",
+        "date": "20 / 10 / 2023",
+        "desc": "Tại bãi biển thơ mộng, một chiếc nhẫn và một câu 'Đồng ý' đã thay đổi cuộc đời chúng mình mãi mãi.",
+        "title": "Màn cầu hôn bất ngờ"
+      },
+      {
+        "img": "",
+        "date": "",
+        "desc": "Mô tả kỷ niệm của bạn...",
+        "icon": "heart",
+        "title": "Kỷ niệm mới"
+      }
+    ],
+    "invitation_text": "Trong sự dịu dàng của những ngày đầu năm, chúng mình hạnh phúc chia sẻ khoảnh khắc khởi đầu hành trình mới. Sự hiện diện của bạn không chỉ là niềm vui mà còn là nhân chứng cho tình yêu bền chặt của chúng mình.",
+    "invitation_quote": "Hạnh phúc là khi được cùng người mình thương, đi qua những ngày bình yên nhât của cuộc đời."
+  }
+}

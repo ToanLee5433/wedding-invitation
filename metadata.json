@@ -1,0 +1,7 @@
+{
+  "name": "Luxury Wedding Invitation",
+  "description": "A minimalist, elegant, and personalized digital wedding invitation with an AI-powered photo booth feature.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Wedding of Trang & Chiến</title>
+
+  <!-- DNS Prefetch for external domains -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
+
+  <!-- Preconnect to Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Preload critical fonts - Optimized: 3 fonts only with Vietnamese subset -->
+  <link rel="preload" as="style"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@400;700&subset=vietnamese&display=swap">
+
+  <!-- Load fonts with display=swap for faster text rendering (iOS FOIT prevention) -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@400;700&subset=vietnamese&display=swap"
+    rel="stylesheet">
+
+  <!-- Local TailwindCSS utilities (optimized, ~35KB instead of 3MB CDN) -->
+  <link rel="stylesheet" href="/tailwind-utilities.css">
+
+  <!-- Main styles -->
+  <link rel="stylesheet" href="/index.css">
+
+  <style>
+    :root {
+      --gold: #D4AF37;
+      --gold-dark: #b8952d;
+      --bg: #FDFCF0;
+      --text-dark: #333333;
+    }
+
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-dark);
+      overflow-x: hidden;
+      font-size: 14px;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* 
+     * Core Font Pairings (Optimized for iOS & Vietnamese)
+     * - Tiêu đề/Tên: Playfair Display (Serif)
+     * - Điểm nhấn/Quote: Great Vibes (Script)
+     * - Nội dung: Montserrat (Sans-serif)
+     */
+
+    /* Primary Serif - Titles & Names */
+    .font-serif-playfair,
+    .font-serif-cinzel,
+    .font-serif-bodoni,
+    .font-serif {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-variant-ligatures: none;
+    }
+
+    /* Primary Script - Quotes & Accents */
+    .font-script-great,
+    .font-script-alex,
+    .font-script-dancing,
+    .font-script {
+      font-family: 'Great Vibes', cursive;
+      font-variant-ligatures: none;
+    }
+
+    /* Primary Sans - Body & Details */
+    .font-sans-montserrat,
+    .font-sans-lato,
+    .font-sans-quicksand {
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    .font-script {
+      font-family: 'Great Vibes', cursive;
+      font-variant-ligatures: none;
+    }
+
+    /* Z-index hierarchy standardization */
+    .z-envelope {
+      z-index: 100000;
+    }
+
+    .z-nav {
+      z-index: 1000002;
+    }
+
+    .z-dashboard {
+      z-index: 1000006;
+    }
+
+    .z-overlay {
+      z-index: 2000001;
+    }
+
+    .z-progress {
+      z-index: 2000002;
+    }
+
+    .z-max {
+      z-index: 2147483647;
+    }
+
+    /* For critical popups/AI booth */
+
+    .text-gold {
+      color: var(--gold);
+    }
+
+    .bg-gold {
+      background-color: var(--gold);
+    }
+
+    .border-gold {
+      border-color: var(--gold);
+    }
+
+    /* Gold opacity variants */
+    .bg-gold\/5 {
+      background-color: rgb(212 175 55 / 0.05);
+    }
+
+    .bg-gold\/10 {
+      background-color: rgb(212 175 55 / 0.1);
+    }
+
+    .bg-gold\/20 {
+      background-color: rgb(212 175 55 / 0.2);
+    }
+
+    .border-gold\/10 {
+      border-color: rgb(212 175 55 / 0.1);
+    }
+
+    .border-gold\/20 {
+      border-color: rgb(212 175 55 / 0.2);
+    }
+
+    .border-gold\/30 {
+      border-color: rgb(212 175 55 / 0.3);
+    }
+
+    .text-gold\/20 {
+      color: rgb(212 175 55 / 0.2);
+    }
+
+    .text-gold\/40 {
+      color: rgb(212 175 55 / 0.4);
+    }
+
+    .shadow-gold\/10 {
+      --tw-shadow-color: rgb(212 175 55 / 0.1);
+    }
+
+    .shadow-gold\/20 {
+      --tw-shadow-color: rgb(212 175 55 / 0.2);
+    }
+
+    .hover\:shadow-gold\/10:hover {
+      --tw-shadow-color: rgb(212 175 55 / 0.1);
+    }
+
+    /* Rose opacity variants */
+    .bg-rose-500\/5 {
+      background-color: rgb(244 63 94 / 0.05);
+    }
+
+    .border-rose-500\/10 {
+      border-color: rgb(244 63 94 / 0.1);
+    }
+
+    /* Blue focus rings */
+    .focus\:ring-blue-500\/20:focus {
+      --tw-ring-color: rgb(59 130 246 / 0.2);
+    }
+
+    .luxury-container {
+      padding-left: clamp(1rem, 10vw, 132px);
+      padding-right: clamp(1rem, 6vw, 75px);
+      padding-top: 60px;
+      padding-bottom: 60px;
+    }
+
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(-100%) skewX(-20deg);
+      }
+
+      100% {
+        transform: translateX(200%) skewX(-20deg);
+      }
+    }
+
+    .shimmer-btn {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .shimmer-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmer 3s infinite;
+    }
+
+    .img-hover-zoom {
+      overflow: hidden;
+    }
+
+    .img-hover-zoom img {
+      transition: transform 1.5s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+
+    .img-hover-zoom:hover img {
+      transform: scale(1.1);
+    }
+
+    body.intro-active {
+      overflow: hidden;
+    }
+
+    .ai-loading-bar {
+      height: 2px;
+      background: linear-gradient(to right, transparent, #D4AF37, transparent);
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      animation: ai-scan 2s infinite linear;
+    }
+
+    @keyframes ai-scan {
+      0% {
+        transform: translateY(-100%);
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+    }
+
+    /* Hiệu ứng hạt (grain) sang trọng */
+    .bg-grain {
+      position: relative;
+    }
+
+    .bg-grain::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('https://www.transparenttextures.com/patterns/soft-wallpaper.png');
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .shimmer-gold {
+      background: linear-gradient(90deg, #D4AF37 0%, #F9F295 50%, #D4AF37 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer-text 3s linear infinite;
+    }
+
+    @keyframes shimmer-text {
+      to {
+        background-position: 200% center;
+      }
+    }
+
+    /* Chống vỡ layout font chữ trên di động */
+    h1,
+    h2,
+    h3 {
+      text-rendering: optimizeLegibility;
+      font-feature-settings: "kern" 1;
+    }
+
+    /* Respect reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      ::before,
+      ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body class="intro-active">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>
