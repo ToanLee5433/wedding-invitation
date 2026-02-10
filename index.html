@@ -3,7 +3,13 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="description" content="Thiệp cưới trực tuyến của Trang & Chiến - Hãy cùng chúng tôi chia sẻ khoảnh khắc hạnh phúc">
+  <meta name="theme-color" content="#D4AF37">
+  
+  <!-- Performance hints -->
+  <meta http-equiv="x-dns-prefetch-control" content="on">
+  
   <title>The Wedding of Trang & Chiến</title>
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
@@ -12,18 +18,25 @@
   <link rel="dns-prefetch" href="https://fonts.googleapis.com">
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link rel="dns-prefetch" href="https://images.unsplash.com">
+  <link rel="dns-prefetch" href="https://dhnarfrkgnotuifqnvzo.supabase.co">
+  <link rel="preconnect" href="https://dhnarfrkgnotuifqnvzo.supabase.co" crossorigin>
 
   <!-- Preconnect to Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Preload hero image for faster LCP -->
+  <link rel="preload" as="image" 
+    href="https://dhnarfrkgnotuifqnvzo.supabase.co/storage/v1/object/public/wedding-media/trang-chien-2026/images/hero.jpg"
+    fetchpriority="high">
 
-  <!-- Preload critical fonts - Optimized: 3 fonts only with Vietnamese subset -->
+  <!-- Preload critical fonts - Optimized: 5 fonts only with Vietnamese subset -->
   <link rel="preload" as="style"
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@400;700&subset=vietnamese&display=swap">
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@400;700&family=Cinzel:wght@400;700;900&family=Quicksand:wght@300;400;500;700&subset=vietnamese&display=swap">
 
   <!-- Load fonts with display=swap for faster text rendering (iOS FOIT prevention) -->
   <link
-    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@400;700&subset=vietnamese&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Montserrat:wght@400;700&family=Cinzel:wght@400;700;900&family=Quicksand:wght@300;400;500;700&subset=vietnamese&display=swap"
     rel="stylesheet">
 
   <!-- Local TailwindCSS utilities (optimized, ~35KB instead of 3MB CDN) -->
@@ -171,6 +184,166 @@
 
     .hover\:shadow-gold\/10:hover {
       --tw-shadow-color: rgb(212 175 55 / 0.1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       Admin Panel Utility Classes
+       (Custom colors/sizes not available in tailwind-utilities.css)
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Background colors */
+    .bg-page { background-color: #FDFCF0; }
+    .bg-page-80 { background-color: rgb(253 252 240 / 0.8); }
+    .bg-ivory { background-color: #faf6ec; }
+    .bg-ivory-hover { background-color: #f4efe4; }
+    .bg-ivory-warm { background-color: #fdf8ed; }
+    .bg-brown { background-color: #2c2418; }
+    .bg-white-70 { background-color: rgb(255 255 255 / 0.7); }
+    .bg-white-10 { background-color: rgb(255 255 255 / 0.1); }
+    .bg-white-5 { background-color: rgb(255 255 255 / 0.05); }
+
+    /* Text colors */
+    .text-brown { color: #2c2418; }
+    .text-brown-deep { color: #3d3425; }
+    .text-brown-light { color: #5a4c30; }
+    .text-brown-med { color: #6b5a3e; }
+    .text-gold-deep { color: #8B6914; }
+    .text-gold-darker { color: #b8952d; }
+    .text-gold-60 { color: rgb(212 175 55 / 0.6); }
+    .text-muted { color: #7a6c56; }
+    .text-muted-light { color: #9a8a6a; }
+    .text-muted-alt { color: #a09070; }
+    .text-muted-lightest { color: #b0a090; }
+    .text-white-40 { color: rgb(255 255 255 / 0.4); }
+    .text-white-70 { color: rgb(255 255 255 / 0.7); }
+
+    /* Border colors */
+    .border-warm { border-color: #e8e0cf; }
+    .border-white-15 { border-color: rgb(255 255 255 / 0.15); }
+    .border-white-10 { border-color: rgb(255 255 255 / 0.1); }
+
+    /* Divide colors */
+    .divide-ivory > * + * { border-color: #f4efe4; }
+
+    /* Font sizes */
+    .text-xxs { font-size: 10px; }
+    .text-xs-sm { font-size: 11px; }
+    .text-xs-plus { font-size: 13px; }
+
+    /* Tracking */
+    .tracking-extra-wide { letter-spacing: 0.2em; }
+
+    /* Hover backgrounds */
+    .hover\:bg-gold-dark:hover { background-color: #b8952d; }
+    .hover\:bg-gold-light:hover { background-color: #e5c44a; }
+    .hover\:bg-gold:hover { background-color: #D4AF37; }
+    .hover\:bg-gold-20:hover { background-color: rgb(212 175 55 / 0.2); }
+    .hover\:bg-ivory-hover:hover { background-color: #f4efe4; }
+    .hover\:bg-ivory-warm:hover { background-color: #fdf8ed; }
+    .hover\:bg-warm:hover { background-color: #e8e0cf; }
+    .hover\:bg-white-10:hover { background-color: rgb(255 255 255 / 0.1); }
+
+    /* Hover text */
+    .hover\:text-gold:hover { color: #D4AF37; }
+    .hover\:text-brown:hover { color: #2c2418; }
+    .hover\:text-brown-med:hover { color: #6b5a3e; }
+    .hover\:text-brown-light:hover { color: #5a4c30; }
+
+    /* Hover shadows */
+    .hover\:shadow-md:hover { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); }
+    .hover\:shadow-lg:hover { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+
+    /* Hover states for standard colors used in admin */
+    .hover\:bg-rose-600:hover { background-color: #e11d48; }
+    .hover\:bg-emerald-600:hover { background-color: #059669; }
+    .hover\:text-blue-500:hover { color: #3b82f6; }
+    .hover\:text-blue-600:hover { color: #2563eb; }
+    .hover\:text-emerald-600:hover { color: #059669; }
+    .hover\:text-rose-500:hover { color: #f43f5e; }
+    .hover\:text-amber-600:hover { color: #d97706; }
+
+    /* Transition shadow helper */
+    .transition-shadow {
+      transition-property: box-shadow;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 150ms;
+    }
+
+    /* Focus states for gold-themed inputs */
+    .focus-gold:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgb(212 175 55 / 0.15);
+      border-color: rgb(212 175 55 / 0.4);
+    }
+
+    /* Additional hover states */
+    .hover\:bg-ivory:hover { background-color: #FDFCF0; }
+    .hover\:bg-black:hover { background-color: #000000; }
+
+    /* Fill utility for SVG */
+    .fill-white\/40 { fill: rgb(255 255 255 / 0.4); }
+
+    /* Bg with opacity modifiers */
+    .bg-slate-50\/50 { background-color: rgb(248 250 252 / 0.5); }
+
+    /* Focus ring gold */
+    .focus\:ring-gold\/20:focus {
+      --tw-ring-color: rgb(212 175 55 / 0.2);
+      box-shadow: 0 0 0 3px rgb(212 175 55 / 0.2);
+    }
+
+    /* Group hover translate-x-full */
+    .group:hover .group-hover\:translate-x-full {
+      transform: translateX(100%);
+    }
+
+    /* Shadow color utility */
+    .shadow-slate-200 {
+      --tw-shadow-color: #e2e8f0;
+      --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);
+      box-shadow: var(--tw-shadow, 0 1px 3px 0 #e2e8f0, 0 1px 2px -1px #e2e8f0);
+    }
+
+    /* Animations: fade-in */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    /* Animations: slide-in-from-top variants */
+    @keyframes slideInFromTop2 {
+      from { opacity: 0; transform: translateY(-0.5rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-in-from-top-2 {
+      animation: slideInFromTop2 0.3s ease-out;
+    }
+
+    @keyframes slideInFromTop4 {
+      from { opacity: 0; transform: translateY(-1rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-in-from-top-4 {
+      animation: slideInFromTop4 0.3s ease-out;
+    }
+
+    /* Animation: zoom-in-95 */
+    @keyframes zoomIn95 {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .zoom-in-95 {
+      animation: zoomIn95 0.2s ease-out;
+    }
+
+    /* Animation: animate-in helper */
+    .animate-in {
+      animation-duration: 0.3s;
+      animation-timing-function: ease-out;
+      animation-fill-mode: both;
     }
 
     /* Rose opacity variants */

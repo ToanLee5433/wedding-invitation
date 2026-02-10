@@ -1,5 +1,5 @@
 
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { Volume2, VolumeX, Music } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,54 +12,105 @@ interface BackgroundMusicProps {
 
 const BackgroundMusic: React.FC<BackgroundMusicProps> = ({ url, isPlaying, setIsPlaying, visible = true }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [audioReady, setAudioReady] = useState(false);
+  const hasInteracted = useRef(false);
 
+  // Resolve the streaming URL
   const streamUrl = useMemo(() => {
     if (!url) return '';
     // Handle Google Drive links
     if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
       const match = url.match(/[-\w]{25,}/);
       const id = match ? match[0] : '';
-      if (id) {
-        // Use export=download for direct download link
-        return `https://docs.google.com/uc?export=download&id=${id}`;
-      }
+      if (id) return `https://drive.google.com/uc?export=download&id=${id}`;
     }
     return url;
   }, [url]);
 
+  // Setup audio element once
   useEffect(() => {
+    if (!streamUrl) {
+      setAudioReady(false);
+      return;
+    }
+
     const audio = audioRef.current;
-    if (!audio || !streamUrl) return;
+    if (!audio) return;
 
     audio.src = streamUrl;
     audio.loop = true;
-    audio.volume = 0.5;
+    audio.volume = 0.4;
+    audio.preload = 'auto';
+
+    const onCanPlay = () => {
+      setAudioReady(true);
+      console.log('✅ Audio ready to play');
+    };
+    const onError = () => {
+      console.warn('⚠️ Audio source could not be loaded:', streamUrl);
+      setAudioReady(false);
+    };
+
+    audio.addEventListener('canplaythrough', onCanPlay);
+    audio.addEventListener('error', onError);
+
+    return () => {
+      audio.removeEventListener('canplaythrough', onCanPlay);
+      audio.removeEventListener('error', onError);
+    };
+  }, [streamUrl]);
+
+  // Play/pause control
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
     if (isPlaying) {
-      audio.play().catch(err => {
-        console.warn('Audio play blocked:', err);
-        // Browsers may block autoplay - user interaction required
+      audio.play().catch(() => {
+        // Browser blocked autoplay, will retry on next user click
+        if (!hasInteracted.current) {
+          setIsPlaying(false);
+        }
       });
     } else {
       audio.pause();
     }
-  }, [streamUrl, isPlaying]);
+  }, [isPlaying, setIsPlaying]);
+
+  // Handle user click - this always works because it's a user gesture
+  const handleToggle = useCallback(() => {
+    hasInteracted.current = true;
+    const audio = audioRef.current;
+
+    if (!isPlaying && audio) {
+      // User clicked play - try to play immediately from user gesture
+      audio.play().then(() => {
+        setIsPlaying(true);
+      }).catch(err => {
+        console.warn('Play failed:', err.message);
+      });
+    } else {
+      setIsPlaying(false);
+    }
+  }, [isPlaying, setIsPlaying]);
+
+  // Don't show the button if there's no music URL at all
+  if (!streamUrl) return null;
 
   return (
     <>
-      {/* Hidden Audio Element */}
       <audio ref={audioRef} style={{ display: 'none' }} />
 
-      {/* Floating Toggle Icon */}
       <AnimatePresence>
         {visible && (
           <motion.button
             initial={{ opacity: 0, scale: 0.5, rotate: -180 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             exit={{ opacity: 0, scale: 0.5, rotate: 180 }}
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={handleToggle}
             className={`fixed top-24 right-5 md:top-28 md:right-8 z-[1000005] w-12 h-12 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 overflow-hidden
               ${isPlaying ? 'bg-gold text-white ring-4 ring-gold/20' : 'bg-white text-gray-400 border border-gray-100'}`}
+            title={isPlaying ? 'Tắt nhạc' : 'Bật nhạc'}
           >
             {isPlaying && (
               <motion.div

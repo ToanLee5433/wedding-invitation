@@ -10,8 +10,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.error('❌ Missing Supabase environment variables! Check your .env file.');
 }
 
-// Khởi tạo Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Khởi tạo Supabase client (fallback to empty string to prevent crash)
+export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '');
 
 // Log để debug
 console.log('✅ Supabase client initialized with URL:', supabaseUrl);

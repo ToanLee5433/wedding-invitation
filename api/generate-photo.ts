@@ -79,19 +79,22 @@ RULES:
 
 OUTPUT: Return only the final image.`;
 
-        // 3. Call Gemini API
+        // 3. Call Gemini API (using imagen model for image generation, API key in header)
         const aiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent`,
             {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
                 body: JSON.stringify({
-                    contents: {
+                    contents: [{
                         parts: [
                             { inlineData: { data: bgBase64, mimeType: 'image/jpeg' } },
                             { inlineData: { data: guestImageBase64, mimeType: 'image/jpeg' } },
                             { text: prompt },
                         ],
+                    }],
+                    generationConfig: {
+                        responseModalities: ['TEXT', 'IMAGE'],
                     },
                 }),
             }

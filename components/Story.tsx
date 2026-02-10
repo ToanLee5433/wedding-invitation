@@ -171,10 +171,47 @@ const Story: React.FC<StoryProps> = ({ milestones = [], editMode, weddingSlug, o
                 <div className="flex-1 w-full text-center md:text-left">
                   <div className={`space-y-4 ${idx % 2 !== 0 ? 'md:text-right' : ''}`}>
                     {editMode ? (
-                      <div className="space-y-4 bg-white/50 p-4 rounded-xl border border-dashed border-gold/20 relative">
-                        <input value={m.date} onChange={(e) => onUpdate(idx, 'date', e.target.value)} className="bg-transparent border-b border-gold/30 font-serif italic text-gold text-lg w-full" placeholder="Ngày tháng..." />
-                        <input value={m.title} onChange={(e) => onUpdate(idx, 'title', e.target.value)} className="bg-transparent border-b border-gold/30 font-serif text-2xl font-bold text-gray-800 w-full" placeholder="Tiêu đề mốc..." />
-                        <textarea value={m.desc} onChange={(e) => onUpdate(idx, 'desc', e.target.value)} className="bg-transparent border border-gold/20 rounded-lg p-3 text-gray-500 text-sm w-full h-32" placeholder="Mô tả kỷ niệm..." />
+                      <div className="space-y-6 bg-white/90 p-6 rounded-2xl border border-[#D4AF37]/30 shadow-sm relative group/edit-form hover:shadow-lg hover:border-[#D4AF37] transition-all duration-300">
+                        
+                        {/* Date Input */}
+                        <div className="relative">
+                          <input 
+                            value={m.date} 
+                            onChange={(e) => onUpdate(idx, 'date', e.target.value)} 
+                            className="peer w-full px-4 py-3 bg-white/50 border border-[#D4AF37]/40 rounded-lg focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-[#D4AF37] italic font-serif"
+                            placeholder=" "
+                          />
+                          <label className="absolute left-4 -top-2.5 bg-white px-1 text-xs font-semibold text-[#D4AF37] transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-[#D4AF37]">
+                            Thời gian
+                          </label>
+                        </div>
+
+                        {/* Title Input */}
+                        <div className="relative">
+                          <input 
+                            value={m.title} 
+                            onChange={(e) => onUpdate(idx, 'title', e.target.value)} 
+                            className="peer w-full px-4 py-3 bg-white/50 border border-[#D4AF37]/40 rounded-lg focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-gray-800 font-bold font-serif text-lg"
+                            placeholder=" "
+                          />
+                          <label className="absolute left-4 -top-2.5 bg-white px-1 text-xs font-semibold text-[#D4AF37] transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-[#D4AF37]">
+                            Tiêu đề sự kiện
+                          </label>
+                        </div>
+
+                        {/* Description Input */}
+                        <div className="relative">
+                          <textarea 
+                            value={m.desc} 
+                            onChange={(e) => onUpdate(idx, 'desc', e.target.value)} 
+                            rows={4}
+                            className="peer w-full px-4 py-3 bg-white/50 border border-[#D4AF37]/40 rounded-lg focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 text-gray-600 text-sm leading-relaxed resize-none"
+                            placeholder=" "
+                          />
+                          <label className="absolute left-4 -top-2.5 bg-white px-1 text-xs font-semibold text-[#D4AF37] transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-gray-400 peer-focus:-top-2.5 peer-focus:text-[#D4AF37]">
+                            Câu chuyện kỷ niệm
+                          </label>
+                        </div>
 
                         {/* DELETE BUTTON - INSIDE FORM, ALWAYS VISIBLE */}
                         {onRemove && milestones.length > 1 && (

@@ -48,7 +48,8 @@ const Hero: React.FC<HeroProps> = ({ bgImage, onUpload, editMode, groomName, bri
         className="absolute inset-0 z-0 bg-center bg-cover"
         style={{
           backgroundImage: `url('${actualImage}')`,
-          y: yBg
+          y: yBg,
+          willChange: 'transform'
         }}
       >
         <div className="absolute inset-0 bg-black/45 shadow-inner"></div>
@@ -82,20 +83,32 @@ const Hero: React.FC<HeroProps> = ({ bgImage, onUpload, editMode, groomName, bri
           {/* Names - ROBUST RENDERING */}
           <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-16 w-full mb-10 md:mb-16">
             {editMode ? (
-              <div className="flex flex-col items-center gap-6 font-script-great w-full max-w-xl">
-                <input
-                  value={brideName}
-                  onChange={(e) => onUpdate('bride_name', e.target.value)}
-                  className="bg-transparent border-b border-white/20 text-center focus:outline-none w-full text-5xl md:text-7xl p-4"
-                  placeholder="Bride Name"
-                />
-                <span className="text-gold font-serif-cinzel font-black text-4xl">&</span>
-                <input
-                  value={groomName}
-                  onChange={(e) => onUpdate('groom_name', e.target.value)}
-                  className="bg-transparent border-b border-white/20 text-center focus:outline-none w-full text-5xl md:text-7xl p-4"
-                  placeholder="Groom Name"
-                />
+              <div className="flex flex-col md:flex-row items-center justify-center gap-6 font-script-great w-full max-w-5xl">
+                <div className="relative group w-full max-w-sm">
+                   <input
+                    value={brideName}
+                    onChange={(e) => onUpdate('bride_name', e.target.value)}
+                    className="bg-white/10 border-b border-white/30 text-center focus:outline-none focus:border-[#D4AF37] w-full text-4xl md:text-7xl py-2 md:py-4 px-4 text-white placeholder-white/50 rounded-t-lg transition-all"
+                    placeholder="Tên Cô Dâu"
+                  />
+                  <label className="absolute -top-3 left-0 w-full text-center text-[10px] text-[#D4AF37] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                    Cô dâu
+                  </label>
+                </div>
+
+                <span className="text-[#D4AF37] font-serif-cinzel font-black text-4xl md:text-6xl drop-shadow-lg">&</span>
+                
+                <div className="relative group w-full max-w-sm">
+                  <input
+                    value={groomName}
+                    onChange={(e) => onUpdate('groom_name', e.target.value)}
+                    className="bg-white/10 border-b border-white/30 text-center focus:outline-none focus:border-[#D4AF37] w-full text-4xl md:text-7xl py-2 md:py-4 px-4 text-white placeholder-white/50 rounded-t-lg transition-all"
+                    placeholder="Tên Chú Rể"
+                  />
+                  <label className="absolute -top-3 left-0 w-full text-center text-[10px] text-[#D4AF37] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                    Chú rể
+                  </label>
+                </div>
               </div>
             ) : (
               <h1 className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-10 w-full font-script-great text-white drop-shadow-[0_15px_30px_rgba(0,0,0,1)]">
@@ -124,13 +137,19 @@ const Hero: React.FC<HeroProps> = ({ bgImage, onUpload, editMode, groomName, bri
           ></motion.div>
 
           {/* Date */}
-          <div className="font-serif-playfair text-3xl md:text-5xl italic tracking-[0.3em] font-light text-gold/90 drop-shadow-xl">
+          <div className="font-serif-playfair text-3xl md:text-5xl italic tracking-[0.3em] font-light text-[#D4AF37]/90 drop-shadow-xl mt-4">
             {editMode ? (
-              <input
-                value={eventDate}
-                onChange={(e) => onUpdate('event_date', e.target.value)}
-                className="bg-transparent border-b border-white/20 text-center focus:outline-none w-full text-3xl"
-              />
+              <div className="relative group w-full max-w-md mx-auto">
+                 <input
+                  value={eventDate}
+                  onChange={(e) => onUpdate('event_date', e.target.value)}
+                  className="bg-white/10 border-b border-white/30 text-center focus:outline-none focus:border-[#D4AF37] w-full py-2 text-white placeholder-white/50 transition-all font-serif italic text-2xl md:text-4xl"
+                  placeholder="Ngày cưới (VD: 15 . 01 . 2026)"
+                />
+                 <label className="absolute -top-4 left-0 w-full text-center text-[10px] text-white/60 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity font-sans">
+                    Thời gian tổ chức
+                  </label>
+              </div>
             ) : (
               <p>{eventDate || '15 . 01 . 2026'}</p>
             )}

@@ -2,53 +2,8 @@
 
 /* CSS Variables are already defined in index.html */
 
-/* Additional utility classes */
-.text-gold {
-  color: #D4AF37;
-}
-
-.bg-gold {
-  background-color: #D4AF37;
-}
-
-.border-gold {
-  border-color: #D4AF37;
-}
-
-/* Loading spinner animation */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* Pulse animation */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 300ms;
-}
+/* Gold utilities, animations (.text-gold, .bg-gold, etc.) are defined in index.html <style> block
+   to ensure they load before first paint. Do not duplicate them here. */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {

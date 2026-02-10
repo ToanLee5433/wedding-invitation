@@ -1,11 +1,10 @@
 
 import React, { useEffect, useState, useRef, Suspense, lazy } from 'react';
-import { AnimatePresence, motion, useScroll, useSpring, useInView } from 'framer-motion';
-// Added Sparkles to the lucide-react import
-import { LayoutDashboard, Cog, Eye, Loader2, Volume2, VolumeX, AlertTriangle, Save, Sparkles } from 'lucide-react';
+import { motion, useScroll, useSpring, useInView } from 'framer-motion';
+import { Loader2, Settings as SettingsIcon, Save, Heart, X } from 'lucide-react';
 import { supabase } from './lib/supabaseClient';
 
-// Eager load critical components (above the fold)
+// Eager load critical components
 import Envelope from './components/Envelope';
 import BackgroundMusic from './components/BackgroundMusic';
 import FallingPetals from './components/FallingPetals';
@@ -16,16 +15,24 @@ import Invitation from './components/Invitation';
 import Info from './components/Info';
 import RSVP from './components/RSVP';
 
-// Lazy load heavy components (below the fold or conditional)
-const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+// Admin components (direct import - fixes dynamic import errors)
+import AdminDashboard from './components/AdminDashboard';
+import AdminLogin from './components/AdminLogin';
+
+// Lazy load heavy guest-facing components
 const Story = lazy(() => import('./components/Story'));
 const Album = lazy(() => import('./components/Album'));
 const AIFaceBooth = lazy(() => import('./components/AIFaceBooth'));
 
-// Loading fallback component
 const LoadingFallback = () => (
-  <div className="flex items-center justify-center py-24">
-    <Loader2 className="w-8 h-8 text-gold animate-spin" />
+  <div className="fixed inset-0 z-[50] flex flex-col items-center justify-center bg-[#FDFCF0]">
+    <div className="relative">
+      <div className="absolute inset-0 border-4 border-rose-100 rounded-full animate-ping opacity-20"></div>
+      <div className="w-20 h-20 bg-white border border-rose-100 rounded-full flex items-center justify-center shadow-xl relative z-10">
+        <Heart className="text-rose-400 fill-rose-100 animate-pulse" size={32} />
+      </div>
+    </div>
+    <span className="mt-8 font-serif italic text-slate-500 tracking-widest text-xs animate-pulse">Loading Love Story...</span>
   </div>
 );
 
@@ -43,25 +50,29 @@ export interface WeddingEvent {
 const WEDDING_SLUG = import.meta.env.VITE_WEDDING_SLUG || 'trang-chien-2026';
 
 const DEFAULT_WEDDING_DATA = {
-  hero_image: 'https://iv1cdn.vnecdn.net/giaitri/images/web/2025/10/23/toan-canh-dam-cuoi-cua-vo-chong-do-thi-ha-1761191294.jpg?w=1200&h=0&q=100&dpr=2&fit=crop&s=moA8LWQ9dLsT6d16c1Vmpg',
-  music_url: 'https://docs.google.com/uc?id=1l6GJuaTmotc3lQ2Wead6-2MC2oQ65mc-',
+  id: '75761bf5-ea34-4d70-a15e-a5bc97c40de9',
+  slug: 'trang-chien-2026',
+  hero_image: 'https://dhnarfrkgnotuifqnvzo.supabase.co/storage/v1/object/public/wedding-media/trang-chien-2026/images/hero.jpg',
+  music_url: 'https://dhnarfrkgnotuifqnvzo.supabase.co/storage/v1/object/public/wedding-media/trang-chien-2026/audio/background-music.mp3',
   album_urls: [],
   qr_groom: '',
   qr_bride: '',
   details: {
-    groom_name: 'Chiến',
-    bride_name: 'Trang',
-    event_date: '30 . 01 . 2026',
-    invitation_text: 'Trong sự dịu dàng của những ngày cuối năm, chúng mình hạnh phúc chia sẻ khoảnh khắc khởi đầu hành trình mới. Sự hiện diện của bạn không chỉ là niềm vui mà còn là nhân chứng cho tình yêu bền chặt của chúng mình.',
+    groom_name: 'Trịnh Mạnh Chiến',
+    bride_name: 'Cù Quỳnh Trang',
+    event_date: '15 . 01 . 2026',
+    invitation_text: 'Trong sự dịu dàng của những ngày đầu năm, chúng mình hạnh phúc chia sẻ khoảnh khắc khởi đầu hành trình mới. Sự hiện diện của bạn không chỉ là niềm vui mà còn là nhân chứng cho tình yêu bền chặt của chúng mình.',
     initials: 'T&C',
     invitation_quote: 'Hạnh phúc là khi được cùng người mình thương, đi qua những ngày bình yên nhất của cuộc đời.',
     milestones: [
-      { date: "10 / 05 / 2021", title: "Lần đầu gặp gỡ", desc: "Vào một chiều mưa tại quán cafe nhỏ, định mệnh đã cho chúng mình gặp nhau.", img: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=600" },
+      { date: "10 / 05 / 2021", title: "Lần đầu gặp gỡ", desc: "Vào một chiều mưa tại quán cafe nhỏ, định mệnh đã cho chúng mình gặp nhau.", img: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=600", icon: "calendar" },
       { date: "14 / 02 / 2022", title: "Lời tỏ tình ngọt ngào", desc: "Dưới ánh đèn lung linh của thành phố, chúng mình chính thức gọi nhau là 'Người yêu'.", img: "https://images.unsplash.com/photo-1518196775741-201b817f5024?auto=format&fit=crop&q=80&w=600" },
       { date: "20 / 10 / 2023", title: "Màn cầu hôn bất ngờ", desc: "Tại bãi biển thơ mộng, một chiếc nhẫn và một câu 'Đồng ý' đã thay đổi cuộc đời chúng mình mãi mãi.", img: "https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?auto=format&fit=crop&q=80&w=600" }
     ],
-    vuQuy: { title: 'Lễ Vu Quy', date: '30 . 01 . 2026', time: '08:00 AM', location: 'Tư gia Nhà Gái', address: 'Số 123, Đường Hoa Hồng, TP. Hà Nội', mapLink: 'https://maps.google.com' },
-    thanhHon: { title: 'Lễ Thành Hôn', date: '30 . 01 . 2026', time: '11:00 AM', location: 'Trung tâm Hội nghị Diamond', address: 'Số 456, Đường Kim Cương, TP. Hà Nội', mapLink: 'https://maps.google.com' }
+    vuQuy: { title: 'Lễ Vu Quy', date: '15 . 01 . 2026', time: '08:00 AM', location: 'Tư gia Nhà Gái', address: 'Số 123, Đường Hoa Hồng, TP. Hà Nội', mapLink: 'https://maps.google.com' },
+    thanhHon: { title: 'Lễ Thành Hôn', date: '15 . 01 . 2026', time: '11:00 AM', location: 'Trung tâm Hội nghị Diamond', address: 'Km10 Đ. Nguyễn Trãi, P. Mộ Lao, Hà Đông, Hà Nội, Việt Nam', mapLink: 'https://maps.app.goo.gl/BhqTC2NTD86knWXz9' },
+    bank_groom: 'VCB - 0123456789',
+    bank_bride: 'TPB - 9876543210'
   }
 };
 
@@ -70,6 +81,14 @@ const DEFAULT_WEDDING_DATA = {
 // Navigation tracking uses a separate observer (once: false for continuous tracking)
 const SectionReveal: React.FC<{ children: React.ReactNode; id?: string; onVisible?: (id: string) => void }> = ({ children, id, onVisible }) => {
   const ref = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
   // Separate observer for navigation tracking - needs to fire repeatedly
   const isInViewForNav = useInView(ref, { once: false, amount: 0.4 });
 
@@ -83,10 +102,10 @@ const SectionReveal: React.FC<{ children: React.ReactNode; id?: string; onVisibl
     <motion.div
       ref={ref}
       id={id}
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: isMobile ? 20 : 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: isMobile ? 0.5 : 0.8, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -95,8 +114,17 @@ const SectionReveal: React.FC<{ children: React.ReactNode; id?: string; onVisibl
 
 const App: React.FC = () => {
   const ADMIN_SECRET_PATH = import.meta.env.VITE_ADMIN_SECRET_PATH || '/admin@5433';
-  const isAdmin = window.location.pathname === ADMIN_SECRET_PATH;
-  const isAdminDashboard = isAdmin && window.location.search.includes('dashboard=true');
+  const isAdminPath = window.location.pathname === ADMIN_SECRET_PATH;
+  
+  // Check for specialized Edit Mode (accessed via dashboard)
+  const isEditParam = new URLSearchParams(window.location.search).get('mode') === 'edit';
+  const isSessionAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+  const canEdit = isEditParam && isSessionAuth;
+
+  // Admin authentication (for admin route)
+  const [adminAuthenticated, setAdminAuthenticated] = useState(() => {
+    return isAdminPath && isSessionAuth;
+  });
 
   const getGuestNameFromURL = (): string => {
     const params = new URLSearchParams(window.location.search);
@@ -108,13 +136,8 @@ const App: React.FC = () => {
   };
 
   const [guestName] = useState<string>(getGuestNameFromURL());
-  const [isOpened, setIsOpened] = useState(isAdminDashboard);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(isAdminDashboard);
+  const [isOpened, setIsOpened] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [saving, setSaving] = useState(false);
   const [weddingData, setWeddingData] = useState<any>(null);
   const [activeSection, setActiveSection] = useState('top');
 
@@ -126,15 +149,88 @@ const App: React.FC = () => {
     restDelta: 0.001
   });
 
+  // Handle Updates from Inline Editing
+  const handleUpdate = (field: string, value: any, section?: string) => {
+    if (!canEdit) return;
+    
+    setWeddingData((prev: any) => {
+      const newData = { ...prev };
+      if (section === 'details') {
+        newData.details = { ...newData.details, [field]: value };
+      } else if (section === 'root') {
+        newData[field] = value;
+      }
+      return newData;
+    });
+  };
+
+  const handleStoryUpdate = (idx: number, field: string, value: any) => {
+    setWeddingData((prev: any) => {
+      const newMilestones = [...(prev.details.milestones || [])];
+      newMilestones[idx] = { ...newMilestones[idx], [field]: value };
+      return {
+        ...prev,
+        details: { ...prev.details, milestones: newMilestones }
+      };
+    });
+  };
+
+  const handleStoryAdd = () => {
+    setWeddingData((prev: any) => {
+      const newMilestones = [...(prev.details.milestones || []), { title: 'Mốc mới', date: '01/01/2026', desc: 'Mô tả kỷ niệm...', img: '' }];
+      return {
+        ...prev,
+        details: { ...prev.details, milestones: newMilestones }
+      };
+    });
+  };
+
+  const handleStoryRemove = (idx: number) => {
+    setWeddingData((prev: any) => {
+      const newMilestones = [...(prev.details.milestones || [])];
+      newMilestones.splice(idx, 1);
+      return {
+        ...prev,
+        details: { ...prev.details, milestones: newMilestones }
+      };
+    });
+  };
+
+  const [saving, setSaving] = useState(false);
+  const saveChanges = async () => {
+    if(!weddingData?.id) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase.from('weddings').update({
+        hero_image: weddingData.hero_image,
+        music_url: weddingData.music_url,
+        album_urls: weddingData.album_urls,
+        qr_groom: weddingData.qr_groom,
+        qr_bride: weddingData.qr_bride,
+        details: weddingData.details
+      }).eq('id', weddingData.id);
+      
+      if (error) throw error;
+      alert('Đã lưu thay đổi thành công!');
+    } catch (e: any) {
+      alert('Lỗi lưu: ' + e.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const fetchData = async () => {
-    setLoading(true);
     try {
       let data = null;
       try {
-        const result = await supabase.from('weddings').select('*').eq('slug', WEDDING_SLUG).single();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 5000)
+        );
+        const queryPromise = supabase.from('weddings').select('*').eq('slug', WEDDING_SLUG).single();
+        const result = await Promise.race([queryPromise, timeoutPromise]) as any;
         if (!result.error) data = result.data;
       } catch (supabaseErr) {
-        console.warn("❌ [App] Supabase connection failed:", supabaseErr);
+        console.warn("❌ [App] Supabase connection failed or timeout:", supabaseErr);
       }
 
       if (data) {
@@ -148,7 +244,7 @@ const App: React.FC = () => {
           thanhHon: { ...DEFAULT_WEDDING_DATA.details.thanhHon, ...(data.details?.thanhHon || {}) }
         };
 
-        const mergedData = {
+        setWeddingData({
           ...DEFAULT_WEDDING_DATA,
           id: data.id,
           slug: data.slug,
@@ -158,57 +254,96 @@ const App: React.FC = () => {
           qr_groom: data.qr_groom || DEFAULT_WEDDING_DATA.qr_groom,
           qr_bride: data.qr_bride || DEFAULT_WEDDING_DATA.qr_bride,
           details: mergedDetails
-        };
-        setWeddingData(mergedData);
-      } else {
-        setWeddingData(DEFAULT_WEDDING_DATA);
+        });
       }
     } catch (err) {
-      setWeddingData(DEFAULT_WEDDING_DATA);
-    } finally {
-      setLoading(false);
+      console.warn("❌ [App] Fetch error:", err);
     }
   };
 
   useEffect(() => {
+    setWeddingData(DEFAULT_WEDDING_DATA);
     fetchData();
-  }, []);
+  },[]);
 
-  const updateData = async (newData: any) => {
-    setSaving(true);
-    const updated = { ...weddingData, ...newData };
-    setWeddingData(updated);
-    try {
-      await supabase.from('weddings').update({
-        details: updated.details,
-        hero_image: updated.hero_image,
-        album_urls: updated.album_urls,
-        music_url: updated.music_url,
-        qr_groom: updated.qr_groom,
-        qr_bride: updated.qr_bride
-      }).eq('slug', WEDDING_SLUG);
-    } catch (err) { console.error("Update error:", err); }
-    finally { setSaving(false); }
-  };
+  // ==========================================
+  // ADMIN ROUTE: Login → Dashboard
+  // ==========================================
+  if (isAdminPath) {
+    if (!adminAuthenticated) {
+      return <AdminLogin onLogin={() => setAdminAuthenticated(true)} />;
+    }
+    return (
+      <AdminDashboard
+        weddingId={DEFAULT_WEDDING_DATA.id}
+        slug={WEDDING_SLUG}
+        onClose={() => {
+          sessionStorage.removeItem('admin_authenticated');
+          window.location.href = '/';
+        }}
+      />
+    );
+  }
 
-  if (loading || !weddingData) return (
-    <div className="h-screen w-full flex items-center justify-center bg-[#FDFCF0]">
-      <div className="text-center">
-        <Loader2 className="w-10 h-10 text-gold animate-spin mx-auto mb-4" />
-        <p className="font-serif italic text-gold">Đang chuẩn bị thiệp mời...</p>
+  // ==========================================
+  // GUEST ROUTE: Wedding Invitation
+  // ==========================================
+  if (!weddingData) return null;
+
+  const AdminToolbar = () => {
+    const [expanded, setExpanded] = useState(false);
+    
+    return (
+      <div className={`fixed top-4 left-4 z-[99999] bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border border-rose-100 transition-all duration-300 overflow-hidden ${expanded ? 'w-auto p-4' : 'w-12 h-12 p-0 flex items-center justify-center cursor-pointer hover:scale-110'}`} onClick={() => !expanded && setExpanded(true)}>
+        
+        {!expanded ? (
+          <SettingsIcon size={20} className="text-rose-600 animate-spin-slow" />
+        ) : (
+          <div className="flex flex-col gap-3 min-w-[200px]">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-2 mb-1">
+               <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                 <span className="text-[10px] uppercase font-bold tracking-widest text-slate-500">Chế độ chỉnh sửa</span>
+               </div>
+               <button onClick={(e) => { e.stopPropagation(); setExpanded(false); }} className="text-slate-400 hover:text-rose-500"><X size={16} /></button>
+            </div>
+            
+            <button 
+              onClick={(e) => { e.stopPropagation(); saveChanges(); }}
+              disabled={saving}
+              className="w-full bg-slate-900 text-white px-4 py-3 rounded-xl font-bold text-xs hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200"
+            >
+               {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />} 
+               {saving ? 'Đang lưu...' : 'Lưu Thay Đổi'}
+            </button>
+
+            <button 
+              onClick={(e) => { e.stopPropagation(); window.location.href = ADMIN_SECRET_PATH; }}
+              className="w-full bg-rose-50 text-rose-600 px-4 py-3 rounded-xl font-bold text-xs hover:bg-rose-100 hover:text-rose-700 transition-colors flex items-center justify-center gap-2"
+            >
+               ⬅ Quay lại Admin
+            </button>
+            <div className="text-[9px] text-center text-slate-400 italic mt-1">
+               Click vào văn bản/ảnh để sửa
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div id="top" className="min-h-screen relative bg-[#FDFCF0] bg-grain scroll-smooth">
+      {/* Edit Mode Floating Controls - COLLAPSIBLE */}
+      {canEdit && <AdminToolbar />}
+
       {/* Scroll Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-gold origin-left z-progress"
         style={{ scaleX }}
       />
 
-      <BackgroundMusic url={weddingData.music_url} isPlaying={isMusicPlaying} setIsPlaying={setIsMusicPlaying} visible={isOpened && !showAdmin} />
+      <BackgroundMusic url={weddingData.music_url} isPlaying={isMusicPlaying} setIsPlaying={setIsMusicPlaying} visible={isOpened} />
 
       {!isOpened && (
         <Envelope
@@ -224,161 +359,107 @@ const App: React.FC = () => {
 
       {isOpened && (
         <>
-          {showAdmin && isAdmin ? (
-            <Suspense fallback={<LoadingFallback />}>
-              <AdminDashboard
-                weddingId={weddingData.id}
-                slug={WEDDING_SLUG}
-                onClose={() => {
-                  window.location.href = ADMIN_SECRET_PATH;
+          <FallingPetals />
+          <BottomNav activeSection={activeSection} />
+
+          <SectionReveal id="top" onVisible={setActiveSection}>
+            <Hero
+              bgImage={weddingData.hero_image}
+              groomName={weddingData.details.groom_name}
+              brideName={weddingData.details.bride_name}
+              eventDate={weddingData.details.event_date}
+              editMode={canEdit}
+              weddingSlug={WEDDING_SLUG}
+              onUpload={(url) => handleUpdate('hero_image', url, 'root')}
+              onUpdate={(f, v) => handleUpdate(f, v, 'details')}
+            />
+          </SectionReveal>
+
+          <div className="luxury-container space-y-32 mb-32">
+            <SectionReveal>
+              <Countdown targetDate={weddingData.details.event_date} />
+            </SectionReveal>
+
+            <SectionReveal>
+              <Invitation
+                guestName={guestName}
+                invitationText={weddingData.details.invitation_text}
+                initials={weddingData.details.initials}
+                quote={weddingData.details.invitation_quote}
+                editMode={canEdit}
+                onUpdate={(f, v) => handleUpdate(f, v, 'details')}
+              />
+            </SectionReveal>
+
+            <SectionReveal id="story" onVisible={setActiveSection}>
+              <Suspense fallback={<LoadingFallback />}>
+                <Story
+                  milestones={weddingData.details.milestones || []}
+                  editMode={canEdit}
+                  weddingSlug={WEDDING_SLUG}
+                  onUpdate={handleStoryUpdate}
+                  onAdd={handleStoryAdd}
+                  onRemove={handleStoryRemove}
+                />
+              </Suspense>
+            </SectionReveal>
+
+            <SectionReveal id="album" onVisible={setActiveSection}>
+              <Suspense fallback={<LoadingFallback />}>
+                <Album
+                  photos={weddingData.album_urls || []}
+                  editMode={canEdit}
+                  weddingSlug={WEDDING_SLUG}
+                  onUpload={(newPhotos) => handleUpdate('album_urls', newPhotos, 'root')}
+                />
+              </Suspense>
+            </SectionReveal>
+          </div>
+
+          <SectionReveal>
+            <div className="w-full mb-32">
+              <Suspense fallback={<LoadingFallback />}>
+                <AIFaceBooth />
+              </Suspense>
+            </div>
+          </SectionReveal>
+
+          <div className="luxury-container space-y-32">
+            <SectionReveal id="info" onVisible={setActiveSection}>
+              <Info
+                details={{ vuQuy: weddingData.details.vuQuy, thanhHon: weddingData.details.thanhHon }}
+                editMode={canEdit}
+                onUpdate={(type, field, value) => {
+                  const currentEvent = weddingData.details[type as 'vuQuy' | 'thanhHon'] || {};
+                  handleUpdate(type, { ...currentEvent, [field]: value }, 'details');
                 }}
               />
-            </Suspense>
-          ) : (
-            <>
-              <FallingPetals />
-              <BottomNav activeSection={activeSection} />
+            </SectionReveal>
 
-              {isAdmin && (
-                <div className="fixed bottom-44 right-6 md:bottom-28 md:right-8 z-dashboard flex flex-col gap-4">
-                  <button
-                    onClick={() => setEditMode(!editMode)}
-                    className={`w-12 h-12 rounded-full flex items-center justify-center shadow-2xl transition-all ${editMode ? 'bg-rose-500 text-white' : 'bg-gold text-white hover:scale-110'}`}
-                    title={editMode ? "Xem chế độ khách" : "Chỉnh sửa thiệp"}
-                  >
-                    {editMode ? <Eye size={20} /> : <Cog size={20} />}
-                  </button>
-                  <button
-                    onClick={() => {
-                      window.location.href = ADMIN_SECRET_PATH + '?dashboard=true';
-                    }}
-                    className="bg-slate-900 text-white w-12 h-12 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-all"
-                    title="Quản lý khách mời"
-                  >
-                    <LayoutDashboard size={20} />
-                  </button>
-                </div>
-              )}
+            <SectionReveal id="rsvp" onVisible={setActiveSection}>
+              <RSVP
+                qrGroom={weddingData.qr_groom}
+                qrBride={weddingData.qr_bride}
+                groomName={weddingData.details.groom_name}
+                brideName={weddingData.details.bride_name}
+                bankGroom={weddingData.details.bank_groom || 'VCB - 0123456789'}
+                bankBride={weddingData.details.bank_bride || 'TPB - 9876543210'}
+                weddingSlug={WEDDING_SLUG}
+                editMode={canEdit}
+                onUploadGroom={(url) => handleUpdate('qr_groom', url, 'root')}
+                onUploadBride={(url) => handleUpdate('qr_bride', url, 'root')}
+                onUpdateBankGroom={(val) => handleUpdate('bank_groom', val, 'details')}
+                onUpdateBankBride={(val) => handleUpdate('bank_bride', val, 'details')}
+              />
+            </SectionReveal>
+          </div>
 
-              <div className={`${editMode ? 'pt-20 border-t-4 border-gold shadow-inner' : ''} transition-all duration-500`}>
-                {editMode && (
-                  <div className="fixed top-0 left-0 w-full bg-gold text-white py-2 px-6 flex justify-between items-center z-overlay shadow-lg animate-in slide-in-from-top duration-300">
-                    <span className="text-[10px] uppercase font-black tracking-widest flex items-center gap-2">
-                      <Sparkles size={12} className="animate-pulse" /> Chế độ chỉnh sửa đang bật
-                    </span>
-                    <button onClick={() => setEditMode(false)} className="text-[10px] uppercase font-bold border border-white/30 px-3 py-1 rounded hover:bg-white hover:text-gold transition-all">Đóng</button>
-                  </div>
-                )}
-
-                <SectionReveal id="top" onVisible={setActiveSection}>
-                  <Hero
-                    bgImage={weddingData.hero_image}
-                    groomName={weddingData.details.groom_name}
-                    brideName={weddingData.details.bride_name}
-                    eventDate={weddingData.details.event_date}
-                    editMode={editMode}
-                    weddingSlug={WEDDING_SLUG}
-                    onUpload={(val) => updateData({ hero_image: val })}
-                    onUpdate={(field, val) => updateData({ details: { ...weddingData.details, [field]: val } })}
-                  />
-                </SectionReveal>
-
-                <div className="luxury-container space-y-32 mb-32">
-                  <SectionReveal>
-                    <Countdown targetDate={weddingData.details.event_date} />
-                  </SectionReveal>
-
-                  <SectionReveal>
-                    <Invitation
-                      guestName={guestName}
-                      invitationText={weddingData.details.invitation_text}
-                      initials={weddingData.details.initials}
-                      quote={weddingData.details.invitation_quote}
-                      editMode={editMode}
-                      onUpdate={(field, val) => updateData({ details: { ...weddingData.details, [field]: val } })}
-                    />
-                  </SectionReveal>
-
-                  <SectionReveal id="story" onVisible={setActiveSection}>
-                    <Suspense fallback={<LoadingFallback />}>
-                      <Story
-                        milestones={weddingData.details.milestones || []}
-                        editMode={editMode}
-                        weddingSlug={WEDDING_SLUG}
-                        onUpdate={(idx, field, val) => {
-                          const newMilestones = [...weddingData.details.milestones];
-                          newMilestones[idx] = { ...newMilestones[idx], [field]: val };
-                          updateData({ details: { ...weddingData.details, milestones: newMilestones } });
-                        }}
-                        onAdd={() => {
-                          const newMilestones = [...(weddingData.details.milestones || []), {
-                            date: '',
-                            title: 'Kỷ niệm mới',
-                            desc: 'Mô tả kỷ niệm của bạn...',
-                            img: '',
-                            icon: 'heart'
-                          }];
-                          updateData({ details: { ...weddingData.details, milestones: newMilestones } });
-                        }}
-                        onRemove={(idx) => {
-                          const newMilestones = weddingData.details.milestones.filter((_: any, i: number) => i !== idx);
-                          updateData({ details: { ...weddingData.details, milestones: newMilestones } });
-                        }}
-                      />
-                    </Suspense>
-                  </SectionReveal>
-
-                  <SectionReveal id="album" onVisible={setActiveSection}>
-                    <Suspense fallback={<LoadingFallback />}>
-                      <Album photos={weddingData.album_urls || []} editMode={editMode} weddingSlug={WEDDING_SLUG} onUpload={(idx, val) => {
-                        const newAlbum = [...(weddingData.album_urls || Array(6).fill(''))];
-                        newAlbum[idx] = val;
-                        updateData({ album_urls: newAlbum });
-                      }} />
-                    </Suspense>
-                  </SectionReveal>
-                </div>
-
-                <SectionReveal>
-                  <div className="w-full mb-32">
-                    <Suspense fallback={<LoadingFallback />}>
-                      <AIFaceBooth />
-                    </Suspense>
-                  </div>
-                </SectionReveal>
-
-                <div className="luxury-container space-y-32">
-                  <SectionReveal id="info" onVisible={setActiveSection}>
-                    <Info
-                      details={{ vuQuy: weddingData.details.vuQuy, thanhHon: weddingData.details.thanhHon }}
-                      editMode={editMode}
-                      onUpdate={(type, field, val) => {
-                        const newDetails = { ...weddingData.details };
-                        newDetails[type] = { ...newDetails[type], [field]: val };
-                        updateData({ details: newDetails });
-                      }}
-                    />
-                  </SectionReveal>
-
-                  <SectionReveal id="rsvp" onVisible={setActiveSection}>
-                    <RSVP
-                      qrGroom={weddingData.qr_groom} qrBride={weddingData.qr_bride}
-                      weddingSlug={WEDDING_SLUG} editMode={editMode}
-                      onUploadGroom={(val) => updateData({ qr_groom: val })}
-                      onUploadBride={(val) => updateData({ qr_bride: val })}
-                    />
-                  </SectionReveal>
-                </div>
-              </div>
-
-              <footer className="py-24 text-center border-t border-gold/10 bg-white mt-32 pb-48 md:pb-24">
-                <p className="font-script text-4xl text-gold mb-4 tracking-tighter">
-                  {weddingData.details.bride_name} & {weddingData.details.groom_name}
-                </p>
-                <p className="font-serif italic text-gray-400 text-[12px] uppercase tracking-widest">Happily Ever After • 2026</p>
-              </footer>
-            </>
-          )}
+          <footer className="py-24 text-center border-t border-gold/10 bg-white mt-32 pb-48 md:pb-24">
+            <p className="font-script text-4xl text-gold mb-4 tracking-tighter">
+              {weddingData.details.bride_name} & {weddingData.details.groom_name}
+            </p>
+            <p className="font-serif italic text-gray-400 text-[12px] uppercase tracking-widest">Happily Ever After • 2026</p>
+          </footer>
         </>
       )}
     </div>

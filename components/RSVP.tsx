@@ -2,20 +2,28 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { uploadMedia } from '../lib/storage';
-import { Heart, Send, Sparkles, Loader2, Users, Gift, X, QrCode, Download } from 'lucide-react';
-import { suggestWeddingWish } from '../services/gemini';
+import { Heart, Send, Loader2, Users, Gift, X, QrCode, Download } from 'lucide-react';
 
 interface RSVPProps {
   qrGroom: string;
   qrBride: string;
+  groomName: string;
+  brideName: string;
+  bankGroom: string;
+  bankBride: string;
   onUploadGroom: (val: string) => void;
   onUploadBride: (val: string) => void;
+  onUpdateBankGroom: (val: string) => void;
+  onUpdateBankBride: (val: string) => void;
   editMode: boolean;
   weddingSlug: string;
-  initialWish?: string;
 }
 
-const RSVP: React.FC<RSVPProps> = ({ qrGroom, qrBride, onUploadGroom, onUploadBride, editMode, weddingSlug, initialWish }) => {
+const RSVP: React.FC<RSVPProps> = ({ 
+  qrGroom, qrBride, groomName, brideName, bankGroom, bankBride,
+  onUploadGroom, onUploadBride, onUpdateBankGroom, onUpdateBankBride,
+  editMode, weddingSlug
+}) => {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
@@ -73,7 +81,7 @@ const RSVP: React.FC<RSVPProps> = ({ qrGroom, qrBride, onUploadGroom, onUploadBr
                   <option>Sẽ tham dự</option>
                   <option>Tiếc quá, không thể</option>
                 </select>
-                <input type="number" min="1" value={formData.count} onChange={(e) => setFormData({ ...formData, count: parseInt(e.target.value) })} className="bg-slate-50 rounded-xl px-4 py-4 border-none outline-none" />
+                <input type="number" min="1" value={formData.count} onChange={(e) => setFormData({ ...formData, count: parseInt(e.target.value) || 1 })} className="bg-slate-50 rounded-xl px-4 py-4 border-none outline-none" />
               </div>
               <textarea placeholder="Lời chúc gửi tới đôi trẻ..." value={formData.wish} onChange={(e) => setFormData({ ...formData, wish: e.target.value })} className="w-full bg-slate-50 rounded-xl px-6 py-4 min-h-[120px] border-none outline-none" />
               <button type="submit" disabled={loading} className="w-full py-4 bg-gold text-white rounded-xl uppercase font-black tracking-widest hover:bg-[#B38F2D] transition-all disabled:opacity-50">
@@ -114,8 +122,26 @@ const RSVP: React.FC<RSVPProps> = ({ qrGroom, qrBride, onUploadGroom, onUploadBr
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-                <QRCard name="Chú rể Chiến" bank="VCB - 0123456789" image={qrGroom} editMode={editMode} onUpload={onUploadGroom} onDownload={() => downloadQR(qrGroom, "Chu-Re-Chien")} qrType="groom" />
-                <QRCard name="Cô dâu Trang" bank="TPB - 9876543210" image={qrBride} editMode={editMode} onUpload={onUploadBride} onDownload={() => downloadQR(qrBride, "Co-Dau-Trang")} qrType="bride" />
+                <QRCard 
+                  name={`Chú rể ${groomName.split(' ').pop()}`} 
+                  bank={bankGroom} 
+                  onUpdateBank={onUpdateBankGroom}
+                  image={qrGroom} 
+                  editMode={editMode} 
+                  onUpload={onUploadGroom} 
+                  onDownload={() => downloadQR(qrGroom, "Chu-Re-Chien")} 
+                  qrType="groom" 
+                />
+                <QRCard 
+                  name={`Cô dâu ${brideName.split(' ').pop()}`} 
+                  bank={bankBride} 
+                  onUpdateBank={onUpdateBankBride}
+                  image={qrBride} 
+                  editMode={editMode} 
+                  onUpload={onUploadBride} 
+                  onDownload={() => downloadQR(qrBride, "Co-Dau-Trang")} 
+                  qrType="bride" 
+                />
               </div>
             </div>
           </div>
@@ -124,7 +150,7 @@ const RSVP: React.FC<RSVPProps> = ({ qrGroom, qrBride, onUploadGroom, onUploadBr
     </section>
   );
 
-  function QRCard({ name, bank, image, editMode, onUpload, onDownload, qrType }: any) {
+  function QRCard({ name, bank, onUpdateBank, image, editMode, onUpload, onDownload, qrType }: any) {
     const [uploading, setUploading] = useState(false);
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,9 +172,9 @@ const RSVP: React.FC<RSVPProps> = ({ qrGroom, qrBride, onUploadGroom, onUploadBr
     return (
       <div className="text-center space-y-4">
         <p className="text-[11px] uppercase tracking-widest font-black text-slate-900">{name}</p>
-        <div className="w-full aspect-square bg-slate-50 rounded-3xl p-4 border border-slate-100 relative group flex items-center justify-center overflow-hidden shadow-inner">
+        <div className="w-full aspect-square bg-slate-50 rounded-3xl p-4 border border-slate-100 relative group flex items-center justify-center overflow-hidden shadow-inner select-none">
           {image ? (
-            <img src={image} className="w-full h-full object-contain" alt={name} />
+            <img src={image} className="w-full h-full object-contain mix-blend-multiply" alt={name} />
           ) : (
             <div className="text-slate-300 flex flex-col items-center gap-2">
               <QrCode size={40} />
@@ -156,8 +182,8 @@ const RSVP: React.FC<RSVPProps> = ({ qrGroom, qrBride, onUploadGroom, onUploadBr
             </div>
           )}
           {editMode && (
-            <label className={`absolute inset-0 bg-gold/90 text-white flex items-center justify-center cursor-pointer transition-all ${uploading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-              <span className="text-[9px] font-black uppercase tracking-widest border border-white px-4 py-2 rounded-full flex items-center gap-2">
+            <label className={`absolute inset-0 bg-[#D4AF37]/90 text-white flex items-center justify-center cursor-pointer transition-all ${uploading ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+              <span className="text-[9px] font-black uppercase tracking-widest border border-white px-4 py-2 rounded-full flex items-center gap-2 bg-white/10 backdrop-blur-md">
                 {uploading ? (
                   <>
                     <Loader2 size={12} className="animate-spin" />
@@ -171,9 +197,23 @@ const RSVP: React.FC<RSVPProps> = ({ qrGroom, qrBride, onUploadGroom, onUploadBr
             </label>
           )}
         </div>
-        <p className="text-sm font-bold text-slate-800">{bank}</p>
-        {image && (
-          <button onClick={onDownload} className="inline-flex items-center gap-2 px-4 py-2 bg-gold/10 text-gold rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-gold hover:text-white transition-all">
+        {editMode ? (
+          <div className="relative group/input">
+             <input 
+              value={bank} 
+              onChange={(e) => onUpdateBank(e.target.value)}
+              className="w-full text-center bg-white border border-[#D4AF37]/30 rounded-lg py-3 px-2 text-xs font-bold text-[#D4AF37] focus:outline-none focus:border-[#D4AF37] placeholder-[#D4AF37]/40 shadow-sm"
+              placeholder="Tên NH - STK"
+            />
+            <label className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-white px-1 text-[8px] font-bold text-[#D4AF37] uppercase tracking-widest opacity-0 group-hover/input:opacity-100 transition-opacity whitespace-nowrap">
+              Thông tin ngân hàng
+            </label>
+          </div>
+        ) : (
+          <p className="text-sm font-bold text-slate-800">{bank}</p>
+        )}
+        {image && !editMode && (
+          <button onClick={onDownload} className="inline-flex items-center gap-2 px-4 py-2 bg-[#D4AF37]/10 text-[#D4AF37] rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#D4AF37] hover:text-white transition-all">
             <Download size={12} /> Tải mã QR
           </button>
         )}

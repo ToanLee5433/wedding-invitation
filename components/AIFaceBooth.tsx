@@ -1,7 +1,6 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GoogleGenAI } from "@google/genai";
 import { Camera, Download, RefreshCw, Sparkles, Loader2, Image as ImageIcon, Video, Wand2, X, Check, Info } from 'lucide-react';
 
 const WEDDING_BASE_IMAGE_URL = 'https://iv1cdn.vnecdn.net/giaitri/images/web/2025/10/23/toan-canh-dam-cuoi-cua-vo-chong-do-thi-ha-1761191294.jpg?w=1200&q=100';
@@ -17,6 +16,15 @@ const AIFaceBooth: React.FC = () => {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Cleanup camera stream on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
 
   const startCamera = async () => {
     try {
@@ -70,20 +78,6 @@ const AIFaceBooth: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const fetchAsBase64 = async (url: string): Promise<string> => {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = (reader.result as string).split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   };
 
   const handleAiGeneration = async () => {
@@ -143,7 +137,7 @@ const AIFaceBooth: React.FC = () => {
   return (
     <section className="py-20 md:py-32 px-4 relative overflow-hidden bg-[#FDFCF0]/50">
       {/* Decorative Ornaments */}
-      <div className="absolute top-0 left-0 w-full h-w bg-gradient-to-b from-white to-transparent opacity-60"></div>
+      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent opacity-60"></div>
       <div className="absolute top-10 right-10 w-64 h-64 bg-gold/5 rounded-full blur-3xl"></div>
       <div className="absolute bottom-10 left-10 w-64 h-64 bg-gold/5 rounded-full blur-3xl"></div>
 

@@ -11,8 +11,8 @@ const LinkGenerator: React.FC = () => {
     if (!name.trim()) return;
     
     const formattedName = name.trim().replace(/\s+/g, '_');
-    const baseUrl = window.location.origin + window.location.pathname;
-    const finalUrl = `${baseUrl}?Ten=${encodeURIComponent(formattedName)}`;
+    const baseUrl = window.location.origin + '/';
+    const finalUrl = `${baseUrl}?to=${encodeURIComponent(formattedName)}`;
     
     setGeneratedLink(finalUrl);
     setCopied(false);
@@ -42,7 +42,7 @@ const LinkGenerator: React.FC = () => {
         <div className="p-10 space-y-10">
           <div className="grid md:grid-cols-1 gap-8">
             <div className="space-y-3">
-              <label className="text-[10px] uppercase tracking-widest text-slate-400 font-bold flex items-center gap-2">
+              <label className="text-xxs uppercase tracking-widest text-slate-400 font-bold flex items-center gap-2">
                 <UserPlus size={12} /> Tên khách mời (Hiển thị trên thiệp)
               </label>
               <div className="flex gap-4">
@@ -71,7 +71,7 @@ const LinkGenerator: React.FC = () => {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-2 text-gold">
                     <Share2 size={16} />
-                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold">Link đã sẵn sàng</span>
+                    <span className="text-xxs uppercase tracking-extra-wide font-bold">Link đã sẵn sàng</span>
                   </div>
                 </div>
 
@@ -82,7 +82,7 @@ const LinkGenerator: React.FC = () => {
                   <button 
                     onClick={copyToClipboard}
                     className={`
-                      shrink-0 flex items-center gap-3 px-8 py-5 rounded-2xl text-[10px] uppercase font-bold tracking-widest transition-all
+                      shrink-0 flex items-center gap-3 px-8 py-5 rounded-2xl text-xxs uppercase font-bold tracking-widest transition-all
                       ${copied ? 'bg-emerald-500 text-white' : 'bg-gold text-slate-900 hover:bg-white'}
                     `}
                   >
@@ -91,7 +91,7 @@ const LinkGenerator: React.FC = () => {
                   </button>
                 </div>
                 
-                <div className="mt-8 flex items-start gap-3 text-[11px] text-slate-400 italic">
+                <div className="mt-8 flex items-start gap-3 text-xs-sm text-slate-400 italic">
                   <div className="w-1.5 h-1.5 rounded-full bg-gold mt-1.5"></div>
                   <p>Mẹo: Bạn có thể gửi link này qua Zalo, Messenger hoặc iMessage để tạo bất ngờ cho khách mời.</p>
                 </div>

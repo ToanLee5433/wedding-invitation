@@ -3,9 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { uploadMedia } from '../lib/storage';
 import { Loader2, X, ZoomIn, Heart } from 'lucide-react';
 
+// Skeleton loader component for better UX
+const ImageSkeleton = () => (
+  <div className="absolute inset-0 bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 animate-pulse">
+    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+  </div>
+);
+
 interface AlbumProps {
   photos: string[];
-  onUpload: (index: number, val: string) => void;
+  onUpload: (newPhotos: string[]) => void;
   editMode: boolean;
   weddingSlug: string;
 }
@@ -13,6 +20,7 @@ interface AlbumProps {
 const Album: React.FC<AlbumProps> = ({ photos, onUpload, editMode, weddingSlug }) => {
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 
   const handleFile = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -20,8 +28,15 @@ const Album: React.FC<AlbumProps> = ({ photos, onUpload, editMode, weddingSlug }
 
     try {
       setUploadingIndex(index);
-      const publicUrl = await uploadMedia(file, weddingSlug, 'images', `album-${index}`);
-      onUpload(index, publicUrl);
+      const publicUrl = await uploadMedia(file, weddingSlug, 'images', `album-${index}-${Date.now()}`);
+      
+      const newPhotos = [...photos];
+      // Ensure array has enough slots if it was sparse
+      while (newPhotos.length <= index) {
+        newPhotos.push(""); 
+      }
+      newPhotos[index] = publicUrl;
+      onUpload(newPhotos);
     } catch (err) {
       console.error('Upload failed:', err);
       alert('Không thể tải ảnh lên. Vui lòng thử lại.');
@@ -31,12 +46,12 @@ const Album: React.FC<AlbumProps> = ({ photos, onUpload, editMode, weddingSlug }
   };
 
   const placeholders = [
-    "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=1200",
-    "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1465495910483-345749a2ce2b?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=80&w=800",
-    "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&q=80&w=800",
+    "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=75&w=800",
+    "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=75&w=800",
+    "https://images.unsplash.com/photo-1583939003579-730e3918a45a?auto=format&fit=crop&q=75&w=800",
+    "https://images.unsplash.com/photo-1465495910483-345749a2ce2b?auto=format&fit=crop&q=75&w=800",
+    "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&q=75&w=800",
+    "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&q=75&w=800",
   ];
 
   const captions = [
@@ -102,19 +117,48 @@ const Album: React.FC<AlbumProps> = ({ photos, onUpload, editMode, weddingSlug }
                 onClick={() => openLightbox(index)}
                 className={`${layouts[index]} relative overflow-hidden rounded-lg shadow-sm group cursor-pointer`}
               >
-                {/* Image with subtle zoom effect and lazy loading */}
+                {/* Skeleton loader while image is loading */}
+                {!loadedImages.has(index) && <ImageSkeleton />}
+                
+                {/* Image with subtle zoom effect and lazy loading + optimization */}
                 <motion.img
                   src={photos[index] || placeholder}
                   alt={captions[index]}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover"
-                  whileHover={{ scale: 1.05 }}
+                  style={{ contentVisibility: 'auto' }}
+                  onLoad={() => setLoadedImages(prev => new Set(prev).add(index))}
+                  whileHover={editMode ? { scale: 1 } : { scale: 1.05 }}
                   transition={{ duration: 0.8 }}
                 />
 
-                {/* Glassmorphism Hover Overlay */}
-                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-all duration-700 flex flex-col justify-end p-4 md:p-8">
+                {/* Edit Mode Overlay - ALWAYS VISIBLE if photo missing, or on hover */}
+                {editMode && (
+                  <label className={`absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] cursor-pointer transition-all duration-300 ${!photos[index] ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                     <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center mb-2 border border-white/40 shadow-xl">
+                        {uploadingIndex === index ? (
+                          <Loader2 className="animate-spin text-white" size={20} />
+                        ) : (
+                          <ZoomIn className="text-white" size={20} />
+                        )}
+                     </div>
+                     <span className="text-[10px] font-bold uppercase tracking-widest text-white drop-shadow-md">
+                        {uploadingIndex === index ? 'Đang tải...' : 'Thay ảnh'}
+                     </span>
+                     <input 
+                       type="file" 
+                       accept="image/*" 
+                       onChange={(e) => handleFile(index, e)} 
+                       disabled={uploadingIndex !== null}
+                       className="hidden" 
+                     />
+                  </label>
+                )}
+
+                {/* Glassmorphism Hover Overlay (View Mode Only) */}
+                {!editMode && (
+                  <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-all duration-700 flex flex-col justify-end p-4 md:p-8">
                   <motion.div
                     initial={{ y: 20, opacity: 0 }}
                     whileHover={{ y: 0, opacity: 1 }}
@@ -129,19 +173,6 @@ const Album: React.FC<AlbumProps> = ({ photos, onUpload, editMode, weddingSlug }
                     </div>
                   </motion.div>
                 </div>
-
-                {/* Edit Mode Overlay */}
-                {editMode && (
-                  <div className={`absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center transition-all duration-300 z-20 ${uploadingIndex === index ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
-                    <label className={`bg-white text-gold px-5 py-3 rounded-full text-[10px] uppercase tracking-widest font-bold cursor-pointer shadow-xl hover:bg-gold hover:text-white transition-all flex items-center gap-2 ${uploadingIndex === index ? 'pointer-events-none' : ''}`}>
-                      {uploadingIndex === index ? (
-                        <><Loader2 size={14} className="animate-spin" /> Đang tải...</>
-                      ) : (
-                        `Thay ảnh ${index + 1}`
-                      )}
-                      <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFile(index, e)} disabled={uploadingIndex !== null} />
-                    </label>
-                  </div>
                 )}
               </motion.div>
             ))}
@@ -200,7 +231,7 @@ const Album: React.FC<AlbumProps> = ({ photos, onUpload, editMode, weddingSlug }
               className="absolute bottom-12 left-1/2 -translate-x-1/2 text-center"
             >
               <p className="text-white font-serif text-2xl italic mb-2">{captions[lightboxIndex]}</p>
-              <p className="text-white/40 text-[10px] uppercase tracking-widest">Chiến & Trang Wedding • 2026</p>
+              <p className="text-white/40 text-[10px] uppercase tracking-widest">Our Wedding Moments • 2026</p>
             </motion.div>
           </motion.div>
         )}

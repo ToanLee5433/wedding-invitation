@@ -50,17 +50,17 @@ const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center text-gold uppercase tracking-[0.8em] text-sm md:text-lg font-black mb-16 md:mb-20"
+          className="text-center text-slate-400 uppercase tracking-[0.8em] text-xs md:text-sm font-bold mb-16 md:mb-20"
         >
           Time until our big day
         </motion.h2>
 
         {/* Countdown Grid - LARGER NUMBERS */}
         <div className="flex justify-center gap-8 md:gap-16 lg:gap-24">
-          <TimeUnit value={timeLeft.days} label="Ngày" />
-          <TimeUnit value={timeLeft.hours} label="Giờ" />
-          <TimeUnit value={timeLeft.minutes} label="Phút" />
-          <TimeUnit value={timeLeft.seconds} label="Giây" />
+          <TimeUnit value={timeLeft.days} label="Ngày" delay={0} />
+          <TimeUnit value={timeLeft.hours} label="Giờ" delay={0.1} />
+          <TimeUnit value={timeLeft.minutes} label="Phút" delay={0.2} />
+          <TimeUnit value={timeLeft.seconds} label="Giây" delay={0.3} />
         </div>
 
         {/* Decorative line */}
@@ -76,17 +76,18 @@ const Countdown: React.FC<{ targetDate: string }> = ({ targetDate }) => {
   );
 };
 
-const TimeUnit = ({ value, label }: { value: number; label: string }) => (
+const TimeUnit = ({ value, label, delay }: { value: number; label: string; delay: number }) => (
   <motion.div
-    initial={{ opacity: 0, scale: 0.8 }}
-    whileInView={{ opacity: 1, scale: 1 }}
+    initial={{ opacity: 0, scale: 0.8, y: 20 }}
+    whileInView={{ opacity: 1, scale: 1, y: 0 }}
     viewport={{ once: true }}
+    transition={{ delay, duration: 0.5 }}
     className="text-center group"
   >
-    <div className="text-5xl md:text-7xl lg:text-8xl font-serif text-gold font-bold mb-3 group-hover:scale-110 transition-transform duration-300 drop-shadow-sm">
+    <div className="text-5xl md:text-7xl lg:text-8xl font-serif text-gold font-bold mb-3 group-hover:scale-110 transition-transform duration-500 drop-shadow-sm bg-clip-text text-transparent bg-gradient-to-br from-gold via-[#F8E79C] to-[#B38F2D] animate-shimmer bg-[length:200%_auto]">
       {String(value).padStart(2, '0')}
     </div>
-    <div className="text-xs md:text-sm uppercase tracking-[0.5em] text-gray-500 font-bold">{label}</div>
+    <div className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-slate-400 font-bold">{label}</div>
   </motion.div>
 );
 

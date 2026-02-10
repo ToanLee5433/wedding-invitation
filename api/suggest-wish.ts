@@ -32,12 +32,12 @@ export default async function handler(req: Request) {
 
         const prompt = `Hãy viết một lời chúc đám cưới ngắn gọn (khoảng 20-30 chữ), chân thành, tinh tế và có chút lãng mạn cho đôi bạn trẻ Trang và Chiến. Người gửi tên là ${guestName || 'một người bạn'}. Hãy viết bằng tiếng Việt, ngôn ngữ tự nhiên, không quá sáo rỗng.`;
 
-        // Call Gemini API via REST
+        // Call Gemini API via REST (API key in header, not URL)
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent`,
             {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: { temperature: 0.9, maxOutputTokens: 100 },
